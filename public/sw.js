@@ -1,4 +1,4 @@
-const CACHE_NAME = 'reptronome-cache-v1';
+const CACHE_NAME = 'reptronome-cache-v2';
 // Cache the essential files: The HTML file itself (represented by the root path) and the external Tailwind CSS dependency.
 const urlsToCache = [
     '/', // Caches the main HTML file (or root context)
