@@ -1,339 +1,346 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Reptronome - Arcade Edition</title>
-        <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-        <link rel="manifest" href="/manifest.json" />
-        <style>
-            /* Retro 80s Arcade Styles */
-            body {
-                font-family: "Inter", monospace; /* Use monospace for a digital/retro feel */
-                background-color: #000000; /* Pure black background */
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                min-height: 100vh;
-                padding: 1rem;
-                /* Simple CRT scanline simulation */
-                background-image: linear-gradient(
-                    rgba(0, 0, 0, 0.4) 1px,
-                    transparent 1px
-                );
-                background-size: 100% 2px;
-            }
-            .container {
-                max-width: 480px;
-                width: 100%;
-                background-color: #1a1a1a; /* Dark console casing */
-                border: 4px solid #00ffff; /* Electric Cyan Frame */
-                box-shadow: 0 0 20px rgba(0, 255, 255, 0.7); /* Neon cyan glow for the screen */
-                border-radius: 12px;
-            }
-            /* Custom Neon Glow Text Effect */
-            .neon-glow {
-                color: #00ffff; /* Cyan */
-                text-shadow: 0 0 5px #00ffff, 0 0 15px #00ffff,
-                    0 0 25px rgba(0, 255, 255, 0.5);
-            }
-            /* Magenta Glow for Down/Stop */
-            .magenta-glow {
-                color: #ff00ff; /* Magenta */
-                text-shadow: 0 0 5px #ff00ff, 0 0 15px #ff00ff,
-                    0 0 25px rgba(255, 0, 255, 0.5);
-            }
-            /* Yellow Glow for Up */
-            .yellow-glow {
-                color: #ffff00; /* Yellow */
-                text-shadow: 0 0 5px #ffff00, 0 0 15px #ffff00,
-                    0 0 25px rgba(255, 255, 0, 0.5);
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Reptronome - Arcade Edition</title>
+    <meta property="og:title" content="Reptronome - Arcade Edition">
+    <meta property="og:description" content="A retro-themed metronome app for bodyweight exercises.">
+    <meta property="og:image" content="share.png">
+    <meta property="og:url" content=".">
+    <meta name="twitter:card" content="summary_large_image">
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="manifest" href="/manifest.json" />
+    <style>
+        /* Retro 80s Arcade Styles */
+        body {
+            font-family: "Inter", monospace;
+            /* Use monospace for a digital/retro feel */
+            background-color: #000000;
+            /* Pure black background */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 1rem;
+            /* Simple CRT scanline simulation */
+            background-image: linear-gradient(rgba(0, 0, 0, 0.4) 1px,
+                    transparent 1px);
+            background-size: 100% 2px;
+        }
+
+        .container {
+            max-width: 480px;
+            width: 100%;
+            background-color: #1a1a1a;
+            /* Dark console casing */
+            border: 4px solid #00ffff;
+            /* Electric Cyan Frame */
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.7);
+            /* Neon cyan glow for the screen */
+            border-radius: 12px;
+        }
+
+        /* Custom Neon Glow Text Effect */
+        .neon-glow {
+            color: #00ffff;
+            /* Cyan */
+            text-shadow: 0 0 5px #00ffff, 0 0 15px #00ffff,
+                0 0 25px rgba(0, 255, 255, 0.5);
+        }
+
+        /* Magenta Glow for Down/Stop */
+        .magenta-glow {
+            color: #ff00ff;
+            /* Magenta */
+            text-shadow: 0 0 5px #ff00ff, 0 0 15px #ff00ff,
+                0 0 25px rgba(255, 0, 255, 0.5);
+        }
+
+        /* Yellow Glow for Up */
+        .yellow-glow {
+            color: #ffff00;
+            /* Yellow */
+            text-shadow: 0 0 5px #ffff00, 0 0 15px #ffff00,
+                0 0 25px rgba(255, 255, 0, 0.5);
+        }
+
+        /* Arcade Button Base Styling */
+        .arcade-btn {
+            border: 3px solid #00ffff;
+            box-shadow: 0 0 10px #00ffff, inset 0 0 5px #00ffff;
+            transition: all 0.1s ease-out;
+            transform: translate(0, 0);
+        }
+
+        .arcade-btn:active {
+            box-shadow: inset 0 0 15px #00ffff, 0 0 5px #00ffff;
+            transform: translate(0, 2px);
+            /* Simulate button press depth */
+        }
+
+        /* Custom animation for the beat display */
+        @keyframes beatPulse {
+            0% {
+                transform: scale(1);
+                opacity: 0.8;
             }
 
-            /* Arcade Button Base Styling */
-            .arcade-btn {
-                border: 3px solid #00ffff;
-                box-shadow: 0 0 10px #00ffff, inset 0 0 5px #00ffff;
-                transition: all 0.1s ease-out;
-                transform: translate(0, 0);
-            }
-            .arcade-btn:active {
-                box-shadow: inset 0 0 15px #00ffff, 0 0 5px #00ffff;
-                transform: translate(0, 2px); /* Simulate button press depth */
+            50% {
+                transform: scale(1.03);
+                opacity: 1;
             }
 
-            /* Custom animation for the beat display */
-            @keyframes beatPulse {
-                0% {
-                    transform: scale(1);
-                    opacity: 0.8;
-                }
-                50% {
-                    transform: scale(1.03);
-                    opacity: 1;
-                }
-                100% {
-                    transform: scale(1);
-                    opacity: 0.8;
-                }
+            100% {
+                transform: scale(1);
+                opacity: 0.8;
             }
-            .pulsing {
-                animation: beatPulse 0.1s ease-out forwards;
-            }
-        </style>
-    </head>
-    <body>
-        <div class="container p-8 rounded-xl">
-            <h1
-                class="text-5xl font-extrabold text-center uppercase mb-2 neon-glow"
-            >
-                Reptronome
-            </h1>
-            <p
-                class="text-center text-gray-200 mb-8 font-mono text-sm neon-glow"
-            >
-                GET READY TO REPEAT! (BETA 3.0)
-            </p>
+        }
 
-            <!-- Current BPM Display -->
-            <div class="text-center mb-10 border-b border-gray-700 pb-4">
-                <span
-                    id="bpm-display"
-                    class="text-5xl font-extrabold yellow-glow"
-                    >30</span
-                >
-                <span class="text-2xl ml-2 text-cyan-400">BPM</span>
-            </div>
+        .pulsing {
+            animation: beatPulse 0.1s ease-out forwards;
+        }
+    </style>
+</head>
 
-            <!-- Beat Status Display - Console Screen -->
-            <div
-                id="beat-status"
-                class="w-full h-32 bg-gray-900 rounded-lg flex items-center justify-center mb-8 border-4 border-gray-700 shadow-inner shadow-black/50"
-            >
-                <span
-                    id="beat-text"
-                    class="text-6xl font-black uppercase text-gray-500 font-mono transition-colors"
-                    >INSERT COIN</span
-                >
-            </div>
+<body>
+    <div class="container p-8 rounded-xl">
+        <h1 class="text-5xl font-extrabold text-center uppercase mb-2 neon-glow">
+            Reptronome
+        </h1>
+        <p class="text-center text-gray-200 mb-8 font-mono text-sm neon-glow">
+            GET READY TO REPEAT! (BETA 3.0)
+        </p>
 
-            <!-- Control Button (Start/Stop Toggle) -->
-            <div class="flex justify-center">
-                <button
-                    id="toggle-btn"
-                    onclick="toggleMetronome()"
-                    class="arcade-btn text-white font-bold py-3 px-12 rounded-lg text-lg uppercase bg-cyan-800 hover:bg-cyan-700"
-                >
-                    Start
-                </button>
-            </div>
+        <!-- Current BPM Display -->
+        <div class="text-center mb-10 border-b border-gray-700 pb-4">
+            <span id="bpm-display" class="text-5xl font-extrabold yellow-glow">30</span>
+            <span class="text-2xl ml-2 text-cyan-400">BPM</span>
         </div>
 
-        <script>
-            // Global State Variables
-            let metronomeIntervalId = null;
-            const FIXED_BPM = 30; // Tempo fixed at 30 BPM
-            let currentBPM = FIXED_BPM;
-            let beatCount = 0;
-            let isRunning = false;
+        <!-- Beat Status Display - Console Screen -->
+        <div id="beat-status"
+            class="w-full h-32 bg-gray-900 rounded-lg flex items-center justify-center mb-8 border-4 border-gray-700 shadow-inner shadow-black/50">
+            <span id="beat-text" class="text-6xl font-black uppercase text-gray-500 font-mono transition-colors">INSERT
+                COIN</span>
+        </div>
 
-            // DOM elements
-            const beatText = document.getElementById("beat-text");
-            const toggleBtn = document.getElementById("toggle-btn"); // Single toggle button
-            const beatStatusDiv = document.getElementById("beat-status");
+        <!-- Control Button (Start/Stop Toggle) -->
+        <div class="flex justify-center">
+            <button id="toggle-btn" onclick="toggleMetronome()"
+                class="arcade-btn text-white font-bold py-3 px-12 rounded-lg text-lg uppercase bg-cyan-800 hover:bg-cyan-700">
+                Start
+            </button>
+        </div>
+    </div>
 
-            // Constants for speech synthesis
-            const UP_WORD = "Up";
-            const DOWN_WORD = "Down";
-            const SPEECH_RATE = 1.8; // Faster rate for metronome function
+    <script>
+        // Global State Variables
+        let metronomeIntervalId = null;
+        const FIXED_BPM = 30; // Tempo fixed at 30 BPM
+        let currentBPM = FIXED_BPM;
+        let beatCount = 0;
+        let isRunning = false;
 
-            /**
-             * Converts text to speech using the Web Speech API.
-             * @param {string} text - The word to speak ("Up" or "Down").
-             */
-            function speak(text) {
-                if ("speechSynthesis" in window) {
-                    // Stop any previous speech to ensure accurate timing
-                    window.speechSynthesis.cancel();
+        // DOM elements
+        const beatText = document.getElementById("beat-text");
+        const toggleBtn = document.getElementById("toggle-btn"); // Single toggle button
+        const beatStatusDiv = document.getElementById("beat-status");
 
-                    const utterance = new SpeechSynthesisUtterance(text);
-                    utterance.rate = SPEECH_RATE;
+        // Constants for speech synthesis
+        const UP_WORD = "Up";
+        const DOWN_WORD = "Down";
+        const SPEECH_RATE = 1; // Faster rate for metronome function
 
-                    // For a reliable and consistent TTS voice across systems, we rely on the default.
-
-                    window.speechSynthesis.speak(utterance);
-                } else {
-                    console.warn(
-                        "Speech Synthesis API not supported in this browser."
-                    );
-                }
-            }
-
-            /**
-             * Main function executed on every beat.
-             */
-            function playBeat() {
-                beatCount++;
-
-                // Determine the word to speak: Up on beat 1, Down on beat 2, then cycle.
-                const currentWord = beatCount % 2 === 1 ? UP_WORD : DOWN_WORD;
-                const isUp = currentWord === UP_WORD;
-
-                speak(currentWord);
-
-                // Visual Update: Apply retro glow and text
-                beatText.textContent = currentWord.toUpperCase();
-
-                // 1. Reset color classes
-                beatText.classList.remove(
-                    "yellow-glow",
-                    "magenta-glow",
-                    "text-gray-500"
-                );
-
-                // 2. Apply correct glow color
-                if (isUp) {
-                    beatText.classList.add("yellow-glow");
-                    beatStatusDiv.style.backgroundColor =
-                        "rgba(255, 255, 0, 0.1)"; /* subtle yellow background pulse */
-                } else {
-                    beatText.classList.add("magenta-glow");
-                    beatStatusDiv.style.backgroundColor =
-                        "rgba(255, 0, 255, 0.1)"; /* subtle magenta background pulse */
-                }
-
-                // 3. Apply quick pulse animation class
-                beatStatusDiv.classList.add("pulsing");
-
-                // Remove the pulse class and reset background color shortly after
-                setTimeout(() => {
-                    beatStatusDiv.classList.remove("pulsing");
-                    beatStatusDiv.style.backgroundColor =
-                        "#1a1a1a"; /* Reset to dark background */
-                }, 150);
-            }
-
-            /**
-             * Starts the metronome interval.
-             */
-            function startMetronome() {
-                if (isRunning) return;
-
-                isRunning = true;
-                beatCount = 0;
-
-                // Calculate interval based on the fixed 30 BPM (2000ms per beat)
-                const intervalMs = Math.round(60000 / currentBPM);
-
-                // Execute the first beat immediately
-                setTimeout(() => playBeat(), 100);
-
-                // Set up the interval for subsequent beats
-                metronomeIntervalId = setInterval(playBeat, intervalMs);
-
-                updateControls();
-            }
-
-            /**
-             * Stops the metronome interval.
-             */
-            function stopMetronome() {
-                if (!isRunning) return;
-
-                clearInterval(metronomeIntervalId);
-                metronomeIntervalId = null;
-                isRunning = false;
-                beatCount = 0;
+        /**
+         * Converts text to speech using the Web Speech API.
+         * @param {string} text - The word to speak ("Up" or "Down").
+         */
+        function speak(text) {
+            if ("speechSynthesis" in window) {
+                // Stop any previous speech to ensure accurate timing
                 window.speechSynthesis.cancel();
 
-                // Visual Reset
-                beatText.textContent = "GAME OVER";
-                beatText.classList.remove("yellow-glow", "magenta-glow");
-                beatText.classList.add("text-gray-500");
-                beatStatusDiv.style.backgroundColor = "#1a1a1a";
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.rate = SPEECH_RATE;
 
-                updateControls();
+                // For a reliable and consistent TTS voice across systems, we rely on the default.
+
+                window.speechSynthesis.speak(utterance);
+            } else {
+                console.warn(
+                    "Speech Synthesis API not supported in this browser."
+                );
+            }
+        }
+
+        /**
+         * Main function executed on every beat.
+         */
+        function playBeat() {
+            beatCount++;
+
+            // Determine the word to speak: Up on beat 1, Down on beat 2, then cycle.
+            const currentWord = beatCount % 2 === 1 ? UP_WORD : DOWN_WORD;
+            const isUp = currentWord === UP_WORD;
+
+            speak(currentWord);
+
+            // Visual Update: Apply retro glow and text
+            beatText.textContent = currentWord.toUpperCase();
+
+            // 1. Reset color classes
+            beatText.classList.remove(
+                "yellow-glow",
+                "magenta-glow",
+                "text-gray-500"
+            );
+
+            // 2. Apply correct glow color
+            if (isUp) {
+                beatText.classList.add("yellow-glow");
+                beatStatusDiv.style.backgroundColor =
+                    "rgba(255, 255, 0, 0.1)"; /* subtle yellow background pulse */
+            } else {
+                beatText.classList.add("magenta-glow");
+                beatStatusDiv.style.backgroundColor =
+                    "rgba(255, 0, 255, 0.1)"; /* subtle magenta background pulse */
             }
 
-            /**
-             * Toggles the metronome state.
-             */
-            function toggleMetronome() {
-                if (isRunning) {
-                    stopMetronome();
-                } else {
-                    startMetronome();
+            // 3. Apply quick pulse animation class
+            beatStatusDiv.classList.add("pulsing");
+
+            // Remove the pulse class and reset background color shortly after
+            setTimeout(() => {
+                beatStatusDiv.classList.remove("pulsing");
+                beatStatusDiv.style.backgroundColor =
+                    "#1a1a1a"; /* Reset to dark background */
+            }, 150);
+        }
+
+        /**
+         * Starts the metronome interval.
+         */
+        function startMetronome() {
+            if (isRunning) return;
+
+            isRunning = true;
+            beatCount = 0;
+
+            // Calculate interval based on the fixed 30 BPM (2000ms per beat)
+            const intervalMs = Math.round(60000 / currentBPM);
+
+            // Execute the first beat immediately
+            setTimeout(() => playBeat(), 100);
+
+            // Set up the interval for subsequent beats
+            metronomeIntervalId = setInterval(playBeat, intervalMs);
+
+            updateControls();
+        }
+
+        /**
+         * Stops the metronome interval.
+         */
+        function stopMetronome() {
+            if (!isRunning) return;
+
+            clearInterval(metronomeIntervalId);
+            metronomeIntervalId = null;
+            isRunning = false;
+            beatCount = 0;
+            window.speechSynthesis.cancel();
+
+            // Visual Reset
+            beatText.textContent = "GAME OVER";
+            beatText.classList.remove("yellow-glow", "magenta-glow");
+            beatText.classList.add("text-gray-500");
+            beatStatusDiv.style.backgroundColor = "#1a1a1a";
+
+            updateControls();
+        }
+
+        /**
+         * Toggles the metronome state.
+         */
+        function toggleMetronome() {
+            if (isRunning) {
+                stopMetronome();
+            } else {
+                startMetronome();
+            }
+        }
+
+        /**
+         * Updates the state and appearance of the single control button.
+         */
+        function updateControls() {
+            if (isRunning) {
+                // Change to STOP state (Red/Magenta Arcade Button)
+                toggleBtn.textContent = "STOP";
+                toggleBtn.classList.remove(
+                    "bg-cyan-800",
+                    "hover:bg-cyan-700",
+                    "neon-glow",
+                    "border-[#00FFFF]"
+                );
+                toggleBtn.classList.add(
+                    "bg-fuchsia-800",
+                    "hover:bg-fuchsia-700",
+                    "magenta-glow",
+                    "arcade-btn-stop"
+                );
+                toggleBtn.style.borderColor = "#FF00FF";
+                toggleBtn.style.boxShadow =
+                    "0 0 10px #FF00FF, inset 0 0 5px #FF00FF";
+            } else {
+                // Change to START state (Blue/Cyan Arcade Button)
+                toggleBtn.textContent = "START";
+                toggleBtn.classList.remove(
+                    "bg-fuchsia-800",
+                    "hover:bg-fuchsia-700",
+                    "magenta-glow",
+                    "arcade-btn-stop"
+                );
+                toggleBtn.classList.add(
+                    "bg-cyan-800",
+                    "hover:bg-cyan-700",
+                    "neon-glow"
+                );
+                toggleBtn.style.borderColor = "#00FFFF";
+                toggleBtn.style.boxShadow =
+                    "0 0 10px #00FFFF, inset 0 0 5px #00FFFF";
+
+                // Initial "Insert Coin" state when stopped
+                if (beatText.textContent !== "GAME OVER") {
+                    beatText.textContent = "INSERT COIN";
                 }
             }
+        }
 
-            /**
-             * Updates the state and appearance of the single control button.
-             */
-            function updateControls() {
-                if (isRunning) {
-                    // Change to STOP state (Red/Magenta Arcade Button)
-                    toggleBtn.textContent = "STOP";
-                    toggleBtn.classList.remove(
-                        "bg-cyan-800",
-                        "hover:bg-cyan-700",
-                        "neon-glow",
-                        "border-[#00FFFF]"
-                    );
-                    toggleBtn.classList.add(
-                        "bg-fuchsia-800",
-                        "hover:bg-fuchsia-700",
-                        "magenta-glow",
-                        "arcade-btn-stop"
-                    );
-                    toggleBtn.style.borderColor = "#FF00FF";
-                    toggleBtn.style.boxShadow =
-                        "0 0 10px #FF00FF, inset 0 0 5px #FF00FF";
-                } else {
-                    // Change to START state (Blue/Cyan Arcade Button)
-                    toggleBtn.textContent = "START";
-                    toggleBtn.classList.remove(
-                        "bg-fuchsia-800",
-                        "hover:bg-fuchsia-700",
-                        "magenta-glow",
-                        "arcade-btn-stop"
-                    );
-                    toggleBtn.classList.add(
-                        "bg-cyan-800",
-                        "hover:bg-cyan-700",
-                        "neon-glow"
-                    );
-                    toggleBtn.style.borderColor = "#00FFFF";
-                    toggleBtn.style.boxShadow =
-                        "0 0 10px #00FFFF, inset 0 0 5px #00FFFF";
+        // Initialize button states on load
+        window.onload = updateControls;
 
-                    // Initial "Insert Coin" state when stopped
-                    if (beatText.textContent !== "GAME OVER") {
-                        beatText.textContent = "INSERT COIN";
-                    }
-                }
-            }
+        // --- Service Worker Implementation for Offline Access (PWA) ---
+        if ("serviceWorker" in navigator) {
+            window.addEventListener("load", () => {
+                navigator.serviceWorker
+                    .register("/sw.js")
+                    .then((registration) => {
+                        console.log(
+                            "Service Worker registered successfully for offline use."
+                        );
+                    })
+                    .catch((error) => {
+                        console.error(
+                            "Service Worker registration failed:",
+                            error
+                        );
+                    });
+            });
+        }
+    </script>
+</body>
 
-            // Initialize button states on load
-            window.onload = updateControls;
-
-            // --- Service Worker Implementation for Offline Access (PWA) ---
-            if ("serviceWorker" in navigator) {
-                window.addEventListener("load", () => {
-                    navigator.serviceWorker
-                        .register("/sw.js")
-                        .then((registration) => {
-                            console.log(
-                                "Service Worker registered successfully for offline use."
-                            );
-                        })
-                        .catch((error) => {
-                            console.error(
-                                "Service Worker registration failed:",
-                                error
-                            );
-                        });
-                });
-            }
-        </script>
-    </body>
 </html>
