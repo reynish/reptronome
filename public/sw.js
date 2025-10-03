@@ -2,7 +2,7 @@ const CACHE_NAME = 'reptronome-cache-v1';
 // Cache the essential files: The HTML file itself (represented by the root path) and the external Tailwind CSS dependency.
 const urlsToCache = [
     '/', // Caches the main HTML file (or root context)
-    'https://cdn.tailwindcss.com',
+    'https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4',
 ];
 
 self.addEventListener('install', (event) => {
