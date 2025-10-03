@@ -17,7 +17,7 @@
         body {
             font-family: "Inter", monospace;
             /* Use monospace for a digital/retro feel */
-            background-color: #000000;
+            background-image: url("/background.jpg");
             /* Pure black background */
             display: flex;
             justify-content: center;
@@ -25,29 +25,18 @@
             min-height: 100vh;
             padding: 1rem;
             /* Simple CRT scanline simulation */
-            background-image: linear-gradient(rgba(0, 0, 0, 0.4) 1px,
-                    transparent 1px);
-            background-size: 100% 2px;
+            background-size: 100vh;
         }
 
         .container {
             max-width: 480px;
             width: 100%;
-            background-color: #1a1a1a;
             /* Dark console casing */
-            border: 4px solid #00ffff;
             /* Electric Cyan Frame */
-            box-shadow: 0 0 20px rgba(0, 255, 255, 0.7);
             /* Neon cyan glow for the screen */
-            border-radius: 12px;
-        }
-
-        /* Custom Neon Glow Text Effect */
-        .neon-glow {
-            color: #00ffff;
-            /* Cyan */
-            text-shadow: 0 0 5px #00ffff, 0 0 15px #00ffff,
-                0 0 25px rgba(0, 255, 255, 0.5);
+            /* background-image: linear-gradient(rgba(0, 0, 0, 0.4) 1px,
+            transparent 1px);
+            background-size: 100% 2px; */
         }
 
         /* Magenta Glow for Down/Stop */
@@ -106,18 +95,12 @@
 
 <body>
     <div class="container p-8 rounded-xl">
-        <h1 class="text-5xl font-extrabold text-center uppercase mb-2 neon-glow">
+        <h1 class="text-5xl font-extrabold text-center uppercase mb-2">
             Reptronome
         </h1>
-        <p class="text-center text-gray-200 mb-8 font-mono text-sm neon-glow">
+        <p class="text-center mb-8 font-mono text-sm">
             GET READY TO REPEAT! (BETA 3.0)
         </p>
-
-        <!-- Current BPM Display -->
-        <div class="text-center mb-10 border-b border-gray-700 pb-4">
-            <span id="bpm-display" class="text-5xl font-extrabold yellow-glow">30</span>
-            <span class="text-2xl ml-2 text-cyan-400">BPM</span>
-        </div>
 
         <!-- Beat Status Display - Console Screen -->
         <div id="beat-status"
