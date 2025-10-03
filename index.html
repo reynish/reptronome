@@ -5,6 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Reptronome - Arcade Edition</title>
         <script src="https://cdn.tailwindcss.com"></script>
+        <link rel="manifest" href="/manifest.json" />
         <style>
             /* Retro 80s Arcade Styles */
             body {
@@ -316,77 +317,10 @@
             window.onload = updateControls;
 
             // --- Service Worker Implementation for Offline Access (PWA) ---
-
-            // Service Worker script logic as a string
-            const swScript = `
-            const CACHE_NAME = 'reptronome-cache-v1';
-            // Cache the essential files: The HTML file itself (represented by the root path) and the external Tailwind CSS dependency.
-            const urlsToCache = [
-                '/', // Caches the main HTML file (or root context)
-                'https://cdn.tailwindcss.com',
-            ];
-
-            self.addEventListener('install', (event) => {
-                event.waitUntil(
-                    caches.open(CACHE_NAME)
-                        .then((cache) => {
-                            console.log('Service Worker: Caching critical resources.');
-                            return cache.addAll(urlsToCache).catch(err => {
-                                console.error('Service Worker: Failed to cache resources', err);
-                            });
-                        })
-                );
-                self.skipWaiting(); // Immediately activate the new service worker
-            });
-
-            self.addEventListener('activate', (event) => {
-                // Clean up old caches
-                const cacheWhitelist = [CACHE_NAME];
-                event.waitUntil(
-                    caches.keys().then(cacheNames => {
-                        return Promise.all(
-                            cacheNames.map(cacheName => {
-                                if (cacheWhitelist.indexOf(cacheName) === -1) {
-                                    console.log('Service Worker: Deleting old cache:', cacheName);
-                                    return caches.delete(cacheName);
-                                }
-                            })
-                        );
-                    })
-                );
-                event.waitUntil(clients.claim()); // Take control of clients
-            });
-
-            self.addEventListener('fetch', (event) => {
-                // Serve cached content first
-                event.respondWith(
-                    caches.match(event.request)
-                        .then((response) => {
-                            // Cache hit - return response
-                            if (response) {
-                                return response;
-                            }
-                            // Fallback to network request (e.g., for speech API)
-                            return fetch(event.request);
-                        }
-                    )
-                );
-            });
-        `;
-
-            // 1. Create a Blob from the worker script string
-            const swBlob = new Blob([swScript], {
-                type: "application/javascript",
-            });
-
-            // 2. Create a URL for the Blob
-            const swUrl = URL.createObjectURL(swBlob);
-
-            // 3. Register the Service Worker
             if ("serviceWorker" in navigator) {
                 window.addEventListener("load", () => {
                     navigator.serviceWorker
-                        .register(swUrl, { scope: "./" })
+                        .register("/sw.js")
                         .then((registration) => {
                             console.log(
                                 "Service Worker registered successfully for offline use."
